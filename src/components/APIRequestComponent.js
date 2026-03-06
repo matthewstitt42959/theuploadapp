@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import HeaderData_json from '../lib/user.json'; // Import Authorization
 /**
  * APIRequestComponent is responsible for sending API requests using
  * the provided URL and method. It updates the loading state and
@@ -17,10 +16,10 @@ export default function APIRequestComponent({ onResponse, requestData, inputs, s
 
     // Initial header data
     const [headers, setHeaders] = useState([
-        { key: 'Authorization', value: HeaderData_json.token },
-        { key: 'Cache-Control', value: HeaderData_json.cacheControl },
-        { key: 'Content-Type', value: HeaderData_json.contentType },
-        { key: 'Accept', value: HeaderData_json.accept },
+        { key: 'Authorization', value: '' },
+        { key: 'Cache-Control', value: 'no-cache' },
+        { key: 'Content-Type', value: 'application/json' },
+        { key: 'Accept', value: 'application/json' },
     ]);
 
 

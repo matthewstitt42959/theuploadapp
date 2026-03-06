@@ -17,34 +17,33 @@ export default function NotesTab() {
   const [text, setText] = React.useState('');
   const [status, setStatus] = React.useState(''); // '', 'Saving…', 'Saved'
   const saveTimer = React.useRef(null);
-  const mounted = React.useRef(false);
+  const lastSavedRef = React.useRef(null);
 
   // Load once on mount
   React.useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved != null) setText(saved);
-    } catch {}
+      if (saved != null) {
+        setText(saved);
+        // remember last saved value to avoid unnecessary writes
+        lastSavedRef.current = saved;
+      }
+    } catch { }
   }, []);
 
   // Debounced autosave (skip initial mount; only write if changed)
   React.useEffect(() => {
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
+    // skip intital empty mount flicker
+    if (text === '' && localStorage.getItem(STORAGE_KEY) === null) return;
 
-    // Avoid writing when the stored value already equals text
-    try {
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing === text) return;
-    } catch {}
+    if (text === lastSavedRef.current) return; // skip if unchanged
 
     setStatus('Saving…');
     clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(() => {
       try {
         localStorage.setItem(STORAGE_KEY, text);
+        lastSavedRef.current = text;
         setStatus('Saved');
         setTimeout(() => setStatus(''), 1200);
       } catch {
@@ -57,7 +56,7 @@ export default function NotesTab() {
 
   const clearNotes = () => {
     setText('');
-    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+    try { localStorage.removeItem(STORAGE_KEY); } catch { }
   };
 
   return (

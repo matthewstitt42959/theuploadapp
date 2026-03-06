@@ -49,25 +49,28 @@ export default function TabsComponent({ activeTab, setActiveTab, onParamChange }
         })}
       </div>
 
-      {/* Only the active panel */}
-      <div
-        className="mt-3 rounded-xl border border-slate-200 p-3"
-        role="tabpanel"
-        id={`panel-${active.id}`}
-        aria-labelledby={`tab-${active.id}`}
-      >
-        {active.id === 'home' ? (
-          active.panel
-        ) : (
-          <div>
-            <h2 className="text-lg font-semibold text-violet-700 mb-3">
-              {active.label}
-            </h2>
-            {active.panel}
-          </div>
-        )}
-
-      </div>
+      {/* All panels mounted; only active one is visible */}
+      {tabs.map((t) => (
+        <div
+          key={t.id}
+          role="tabpanel"
+          id={`panel-${t.id}`}
+          aria-labelledby={`tab-${t.id}`}
+          hidden={active.id !== t.id}
+          className={`mt-3 rounded-xl border border-slate-200 p-3${active.id !== t.id ? ' hidden' : ''}`}
+        >
+          {t.id === 'home' ? (
+            t.panel
+          ) : (
+            <div>
+              <h2 className="text-lg font-semibold text-violet-700 mb-3">
+                {t.label}
+              </h2>
+              {t.panel}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

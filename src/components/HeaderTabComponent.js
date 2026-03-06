@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Heading from './FormatUtilites/Format_Heading';
 import StandardButton from './FormatUtilites/Format_Button';
 import { Table, TableBody, TableCell, TableHeader, TableRow } from '@windmill/react-ui';
-import HeaderData_json from '../lib/user.json'; // Import Authorization
 import { toast } from 'react-toastify';
 
 const HeaderRow = ({ row, index, handleInputChange, handleCheckboxChange, deleteRow }) => (
@@ -42,12 +41,12 @@ const HeaderRow = ({ row, index, handleInputChange, handleCheckboxChange, delete
 
 export default function HeaderTab({ onHeaderButtonChange }) {
 
-    // Initial header data
+    // Initial header data (overridden immediately by fetchHeaders on mount)
     const [headers, setHeaderButtonData] = useState([
-        { key: 'Authorization', value: HeaderData_json.token, disabled: false },
-        { key: 'Cache-Control', value: HeaderData_json.cacheControl, disabled: false },
-        { key: 'Content-Type', value: HeaderData_json.contentType, disabled: false },
-        { key: 'Accept', value: HeaderData_json.accept, disabled: false },
+        { key: 'Authorization', value: '', disabled: false },
+        { key: 'Cache-Control', value: 'no-cache', disabled: false },
+        { key: 'Content-Type', value: 'application/json', disabled: false },
+        { key: 'Accept', value: 'application/json', disabled: false },
     ]);
 
     // Function to fetch headers from user.json

@@ -7,8 +7,8 @@ import tls from 'tls';
 
 
 // --- Load your extra CA once, but APPEND to Node's default roots ---
-const CUSTOM_CA_PATH = 'C:/Users/266833/Documents/Workplace/certificate/cacert.pem';
-const extraCA = fs.existsSync(CUSTOM_CA_PATH) ? fs.readFileSync(CUSTOM_CA_PATH) : null;
+const CUSTOM_CA_PATH = process.env.CUSTOM_CA_PATH;
+const extraCA = CUSTOM_CA_PATH && fs.existsSync(CUSTOM_CA_PATH) ? fs.readFileSync(CUSTOM_CA_PATH) : null;
 const httpAgent = new http.Agent({ keepAlive: true });
 const httpsAgent = new https.Agent({
     rejectUnauthorized: true,

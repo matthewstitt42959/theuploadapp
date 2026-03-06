@@ -7,10 +7,15 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
-First, run the development server:
 
 ```bash
+npm install
 npm run dev
+```
+
+This will install all dependencies and start the Perry ParcelRunner development server.
+- Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
+- Make sure you have Node.js and npm installed on your system.
 # or
 yarn dev
 # or

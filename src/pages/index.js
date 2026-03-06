@@ -10,7 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function HomePage() {
 
   return (
-    <div id="home-container" className="flex items-center justify-center container bg-color">
+    <div id="home-container">
 
       <Head>
         <meta charSet="UTF-8" />

@@ -34,5 +34,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-src/pages/api/user.json
-src/pages/api/user.json
+src/lib/user.json
+src/lib/collections.json
