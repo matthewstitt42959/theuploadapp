@@ -1,78 +1,136 @@
-### conversion of .js app to React
-# reformat/rename script.js to index.js and change to support React
-## Changed name to Perry ParcelRunner
+# Perry ParcelRunner
 
+A personal API testing tool — like Postman, but lighter and self-hosted. Built with Next.js 14 + React.
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+> *Delivering APIs with Postal Precision*
+
+---
+
+## Features
+
+- **Send HTTP requests** — GET, POST, PUT, PATCH, DELETE
+- **Collections sidebar** — save requests into named groups, load them back with one click
+- **Export / Import collections** — share a `perry-collections.json` file with teammates
+- **Query params table** — build query strings visually, not by hand
+- **Headers table** — manage request headers with enable/disable toggles, persisted to disk
+- **Request body editor** — for POST/PUT/PATCH requests
+- **Response panel** — status badge, content-type, duration, size, copy to clipboard
+- **Recent endpoints** — quick access to the last 5 URLs you hit
+- **Notes tab** — auto-saving scratchpad for tokens, payloads, and test notes
+- **Corporate proxy support** — custom CA certificate via environment variable
+
+---
 
 ## Getting Started
 
+### Prerequisites
+- Node.js 18+
+- npm
+
+### Development
 
 ```bash
 npm install
 npm run dev
 ```
 
-This will install all dependencies and start the Perry ParcelRunner development server.
-- Open [http://localhost:3000](http://localhost:3000) in your browser to view the app.
-- Make sure you have Node.js and npm installed on your system.
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+### Production (recommended for shared/work use)
+
+```bash
+npm install
+npm run build
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Configuration
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file in the project root:
 
-## Learn More
+```env
+# Path to your corporate CA certificate (optional)
+CUSTOM_CA_PATH=C:/path/to/your/certificate/cacert.pem
+```
 
-To learn more about Next.js, take a look at the following resources:
+Two runtime config files are **git-ignored** and must be created manually on first install:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| File | Purpose | Initial content |
+|------|---------|-----------------|
+| `src/lib/user.json` | Persisted request headers | `{ "headers": [] }` |
+| `src/lib/collections.json` | Saved request collections | `{ "collections": [] }` |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Transferring to Another Machine
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Create a ZIP of source files (excludes node_modules and build output)
+git archive HEAD --output=perry-parcelrunner.zip
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Transfer the ZIP via USB, network share, or any company-approved method. On the new machine:
 
-# Install
-   npm install node-fetch
-   npm install axios
-   npm config set strict-ssl false
-   npm install react-toastify
-   ## CSS tool
-   npm install @windmill/react-ui
+```bash
+unzip perry-parcelrunner.zip
+npm install
+npm run build && npm start
+```
 
-   Updates - starting 1/26/25
+Then recreate `.env.local`, `src/lib/user.json`, and `src/lib/collections.json` on the new machine.
 
-   1/26 - Updates to _app.js to fix UseEffect issue
-   -- added condition
-   -- Fixes - 
-   2/3 - install middleware
-   -- npm install http-proxy-middleware --save
-   -- Update webpack
-   -- export function webpack(config) {
-    config.resolve.fallback = { fs: false, net: false, ...config.resolve.fallback };
-    return config;
-}
-2/6 - add Mocha
-- npm install --save-dev mocha
--- For unit testing
-- Add babel for jsx support
--- npm install --save-dev @babel/core @babel/preset-env @babel/preset-react @babel/register
--- npm install --save-dev chai
-2/12 - GET functioning
--- After extensive changes to framework and processes
-example api urls
--- https://demoqa.com/BookStore/v1/Books
--- https://api.printful.com/
+**Migrating collections:** use the Export button (↓) in the sidebar on the old machine to download `perry-collections.json`, then use the Import button (↑) on the new machine.
+
+---
+
+## Sharing Collections with Teammates
+
+Each person runs their own local instance. To share a collection:
+
+1. Click the **Export** (↓) button in the Collections sidebar
+2. Send the downloaded `perry-collections.json` to your teammate
+3. They click **Import** (↑) and select the file — collections merge without overwriting existing ones
+
+---
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── HomeComponent.js          # Main UI — state, layout, request orchestration
+│   ├── CollectionsSidebar.js     # Collections panel with export/import
+│   ├── APIRequestComponent.js    # Sends requests via the proxy
+│   ├── TabsComponent.js          # Tab navigation (Home, Params, Headers, Notes)
+│   ├── HeaderTabComponent.js     # Header management table
+│   ├── ParamsTabComponent.js     # Query params table
+│   ├── NotesTab.js               # Auto-saving scratchpad
+│   ├── RecentEndpointComponent.js
+│   └── Body/
+│       ├── RequestBodyComponent.js
+│       └── RequestPanel.js       # Response display
+├── lib/
+│   ├── collectionsStorage.js     # localStorage helper for collections
+│   ├── collections.json          # Runtime collections store (git-ignored)
+│   └── user.json                 # Runtime headers store (git-ignored)
+└── pages/
+    ├── index.js
+    ├── _app.js
+    └── api/
+        ├── proxy.js              # Forwards requests to external APIs
+        ├── getCollections.js
+        ├── saveCollections.js
+        ├── getHeaders.js
+        └── saveHeaders.js
+```
+
+---
+
+## Running Tests
+
+```bash
+npm test          # watch mode
+npm run test:ci   # single run with coverage
+```
