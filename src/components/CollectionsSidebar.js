@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FolderOpen, Plus, ChevronDown, ChevronRight, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { FolderOpen, Plus, ChevronDown, ChevronRight, X, Download, Upload } from 'lucide-react';
 
 const METHOD_COLORS = {
     GET:    'text-emerald-600',
@@ -16,6 +16,7 @@ export default function CollectionsSidebar({
     onCreateCollection,
     onDeleteRequest,
     onDeleteCollection,
+    onImport,
     isSaving,
 }) {
     const [expanded, setExpanded] = useState({});
@@ -23,6 +24,8 @@ export default function CollectionsSidebar({
     const [newName, setNewName] = useState('');
     const [saveTarget, setSaveTarget] = useState('');
     const [saveName, setSaveName] = useState('');
+    const [importError, setImportError] = useState('');
+    const fileInputRef = useRef(null);
 
     const toggleExpand = (id) =>
         setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
@@ -42,6 +45,51 @@ export default function CollectionsSidebar({
         setSaveTarget('');
     };
 
+    const handleExport = () => {
+        const json = JSON.stringify({ collections }, null, 2);
+        const blob = new Blob([json], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'perry-collections.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleImportFile = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setImportError('');
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const parsed = JSON.parse(ev.target.result);
+                if (!Array.isArray(parsed?.collections)) {
+                    setImportError('Invalid file: expected { collections: [...] }');
+                    return;
+                }
+                // Re-ID everything to avoid collisions with existing IDs
+                const now = Date.now();
+                const imported = parsed.collections.map((col, ci) => ({
+                    ...col,
+                    id: `col_${now}_${ci}`,
+                    requests: (col.requests || []).map((req, ri) => ({
+                        ...req,
+                        id: `req_${now}_${ci}_${ri}`,
+                    })),
+                }));
+                onImport([...collections, ...imported]);
+            } catch {
+                setImportError('Could not parse JSON file.');
+            } finally {
+                // Reset input so the same file can be imported again if needed
+                e.target.value = '';
+            }
+        };
+        reader.readAsText(file);
+    };
+
     return (
         <aside className="w-64 shrink-0 border-r border-slate-200 bg-white flex flex-col h-screen sticky top-0">
 
@@ -51,15 +99,51 @@ export default function CollectionsSidebar({
                     <FolderOpen className="w-4 h-4 text-violet-600" />
                     Collections
                 </span>
-                <button
-                    type="button"
-                    onClick={() => setCreatingNew(true)}
-                    className="rounded-md p-1 text-slate-400 hover:text-sky-600 hover:bg-sky-50"
-                    title="New collection"
-                >
-                    <Plus className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        type="button"
+                        onClick={handleExport}
+                        disabled={collections.length === 0}
+                        className="rounded-md p-1 text-slate-400 hover:text-sky-600 hover:bg-sky-50 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Export collections to JSON"
+                    >
+                        <Download className="w-4 h-4" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="rounded-md p-1 text-slate-400 hover:text-sky-600 hover:bg-sky-50"
+                        title="Import collections from JSON"
+                    >
+                        <Upload className="w-4 h-4" />
+                    </button>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".json,application/json"
+                        className="hidden"
+                        onChange={handleImportFile}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setCreatingNew(true)}
+                        className="rounded-md p-1 text-slate-400 hover:text-sky-600 hover:bg-sky-50"
+                        title="New collection"
+                    >
+                        <Plus className="w-4 h-4" />
+                    </button>
+                </div>
             </div>
+
+            {/* Import error */}
+            {importError && (
+                <div className="px-3 py-2 bg-rose-50 border-b border-rose-200 flex items-center justify-between">
+                    <span className="text-xs text-rose-700">{importError}</span>
+                    <button type="button" onClick={() => setImportError('')}>
+                        <X className="w-3 h-3 text-rose-400" />
+                    </button>
+                </div>
+            )}
 
             {/* New collection inline form */}
             {creatingNew && (

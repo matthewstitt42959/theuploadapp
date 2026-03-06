@@ -183,6 +183,8 @@ export default function HomeComponent() {
     const handleDeleteCollection = (colId) =>
         persistCollections(collections.filter(c => c.id !== colId));
 
+    const handleImportCollections = (merged) => persistCollections(merged);
+
     // Builds URL+params safely (respects existing ? or &)
     function constructURLWithParams(url, params) {
         if (!url) return '';
@@ -205,6 +207,7 @@ export default function HomeComponent() {
                 onCreateCollection={handleCreateCollection}
                 onDeleteRequest={handleDeleteRequest}
                 onDeleteCollection={handleDeleteCollection}
+                onImport={handleImportCollections}
                 isSaving={isSavingCollection}
             />
 
