@@ -36,3 +36,10 @@ yarn-error.log*
 next-env.d.ts
 src/lib/user.json
 src/lib/collections.json
+src/lib/db-connections.json
+src/lib/batches.json
+src/lib/playwright-runs.json
+src/lib/playwright-features/
+src/lib/playwright-steps/
+.pw-bdd-generated/
+.pw-results/

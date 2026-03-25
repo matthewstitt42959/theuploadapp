@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node -e \"const p = require\\(''./node_modules/playwright-bdd/package.json''\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const p = require\\(''./node_modules/jsonpath-plus/package.json''\\); console.log\\(p.version\\)\")"
+    ]
+  }
+}

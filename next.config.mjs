@@ -1,10 +1,17 @@
-export function webpack(config) {
-    config.resolve.fallback = { 
-        fs: false, 
-        net: false,
-        console: false,
-        async_hooks: false, // Disable async_hooks for client-side builds
-        ...config.resolve.fallback };
-    return config;
-}
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    webpack(config) {
+        config.resolve.fallback = {
+            fs: false,
+            net: false,
+            tls: false,
+            dns: false,
+            console: false,
+            async_hooks: false,
+            ...config.resolve.fallback,
+        };
+        return config;
+    },
+};
 
+export default nextConfig;
